@@ -6,6 +6,7 @@ import Usuario from '../models/usuario'
 class Auth {
 
     getLogin = (req,res) => {
+       
         if(req.session.loggedIn){
             res.redirect('/')
         }
@@ -14,31 +15,22 @@ class Auth {
      }
 
      postLogin = async(req,res) => {
-        // const {username,password} = req.body 
-        //     if(username.length > 0 && password.length > 0){
-        //      const user = await Usuario.findOne({username})
-        //       const match = bcrypt.compare(password,user.password)
-        //         if(!match){
-        //             return res.redirect('/login')
-        //         }
-        //             req.session.loggedIn = true
-        //             req.session.user = user
-        //             return req.session.save(err => {
-        //                 res.redirect('/')
-        //               });
-                    
-        //     }
-        res.json(req.session,req.user)
+     if(req.session.loggedIn){
+      return res.redirect('/')
+     }
+     req.session.loggedIn = true
+      await req.session.save()
+      return res.redirect('/')
+
      }
 
-     
-
      getLogOut  = (req,res) => {
+       
           if(!req.session.loggedIn){
-             return res.redirect('/')
+             return res.redirect('/login')
           }
 
-        const username = req.session.username
+        const username = req.user.username
          
          req.session.destroy();
          
@@ -52,27 +44,9 @@ class Auth {
      }
 
      postSignUp = async(req,res) => {
-        const {username,contraseña} = req.body 
-        let password
-
-        if(username.length > 0 && contraseña.length > 0){
-            const user = await Usuario.findOne({username})
-             if(user){
-                return res.redirect('/signup')
-             }
-
-             const salt = bcrypt.genSaltSync()
-             password = bcrypt.hashSync( contraseña, salt )
-             const userToSave = {username,password}
-             
-            
-                const usuario = new Usuario(userToSave)
-                
-                await usuario.save()
-                return res.redirect('/login')
-
-        }
-        else res.redirect('/signup')
+      req.session.loggedIn = true
+      await req.session.save()
+          res.redirect('/')     
      }
 
 }

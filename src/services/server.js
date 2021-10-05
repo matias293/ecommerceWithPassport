@@ -5,7 +5,7 @@ import io from 'socket.io';
 import session from 'express-session';
 import cookieParser from 'cookie-parser'
 import MongoStore from 'connect-mongo';
-import passport from 'passport'
+import passport from '../middlewares/authPaspport'
 
 
 import apiRouter from '../routes/index';
@@ -53,24 +53,15 @@ app.use(express.static(publicFolderPath));
 app.use('/api', apiRouter);
 app.use('/',authRouter)
 
-// app.use(async(req, res, next) => {
-  
-//   if(!req.session.user){
-//     return next()
-//   }
-//   const user = Usuario.findById(req.session.user._id)
-//    if(!user) next()
-//    req.user = user
-//    next()
-// })
+
 
 
 
 app.use('/',(req,res,next)=>{
-  
+
 
   if(req.session.loggedIn){
-    return res.render('home',{pageTitle:'Home', mensaje:req.session.user.username, isLogIn:req.session.loggedIn,username:''})
+    return res.render('home',{pageTitle:'Home', mensaje:req.user.username, isLogIn:req.session.loggedIn,username:''})
   }
   res.render('home',{pageTitle:'Home',isLogIn:false,username:''})
 })
